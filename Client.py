@@ -22,6 +22,7 @@ import time
 
 serverIP = ""
 serverPort = 0
+currentServer = ''
 
 def display_commands(self):
         print("Help Page goes here")
@@ -41,12 +42,25 @@ class Server (threading.Thread):
         print(self.myUserName, " connecting to server ", ip, " on port ", port, " and thread ", self.ID)
 
         self.sock.connect(self.serverAddress)
-        self.sock.sendall(user.encode())
+        self.sendMsg(user.encode())
 
         while self.flag:
-            data = self.sock.recv(1024)
+            data = self.recvMsg()
             if len(data) > 0:
-                print(data)
+                if data == b'SUCCESS':
+                    print("Successfully registered with ", serverIP, " on port ", serverPort)
+                elif data == b'FAILURE':
+                    print("Failed to register with server, probably because I am using the same name of someone already registered. New name?")
+                else:
+                    print("Unknown what was recieved")
+            else:
+                break
+
+    def sendMsg(self, msg):
+        self.sock.sendall(msg)
+
+    def recvMsg(self):
+        return self.sock.recv(1024)
 
 class Player:
     flag = True
@@ -74,6 +88,6 @@ while True:
     if cmd[0] == 'register':
         serverIP = cmd[2]
         serverPort = int(cmd[3])
-        server = Server(serverIP, serverPort, cmd[1], threading.activeCount() + 1)
+        currentServer = Server(serverIP, serverPort, cmd[1], threading.activeCount() + 1)
     elif cmd[0] == 'help':
         display_commands()
