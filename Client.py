@@ -72,6 +72,6 @@ while True:
     if cmd[0] == 'register':
         serverIP = cmd[2]
         serverPort = int(cmd[3])
-        server = Server(serverIP, serverPort, cmd[1], threading.currentThread() + 1)
+        server = Server(serverIP, serverPort, cmd[1], threading.activeCount() + 1)
     elif cmd[0] == 'help':
         display_commands()
