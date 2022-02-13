@@ -33,6 +33,7 @@ class Server (threading.Thread):
 
     def __init__(self, ip, port, user, threadID):
         threading.Thread.__init__(self)
+        #TCP SOCKET CONNECT
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.serverAddress = (ip, port)
         self.ID = threadID
