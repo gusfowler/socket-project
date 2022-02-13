@@ -35,13 +35,16 @@ class Player (threading.Thread):
         self.ID = threadID
 
         print("New Player ", name, " at ip ", ip, " on thread # ", self.ID)
-        self.sendMsg(b'ACK')
+        self.sendMsg(b'SUCCESS')
 
     def sendMsg(self, data):
         self.connection.sendall(data)
 
     def recvMsg(self):
         return self.connection.recv(1024)
+
+    def getName(self):
+        return self.playerName
 
 class Manager:
     flag = True
@@ -66,18 +69,29 @@ class Manager:
             self.server.listen()
             connection, address = self.server.accept()
 
-            newPlayer = Player(str(repr(connection.recv(1024))), address, connection, threading.currentThread() + 1)
-            self.listOfPlayers.append(newPlayer)
+            #attempt to register all connections
+            self.register(address, connection)
+
+            
             
 
     ## MILESTONE REQUIREMENTS
-    def register(self, address, port):
-        if len(user) >= 16 or port > 23499:
-            return 'FAILURE'
-        elif name not in listOfUsers:
-            self.listOfUsers[user] = user
-            print(f'User Registered: {user}')
-            return 'SUCCESS'
+    def register(self, address, connection):
+        #check if user with same name exists
+        nameExists = False
+        name = str(repr(connection.recv(1024)))
+        for player in self.arrPlayers:
+            if name == player.getName():
+                nameExists = True
+
+        #create and register new player if name is not present
+        if not nameExists: 
+            newPlayer = Player(name, address, connection, threading.currentThread() + 1)
+            self.listOfPlayers.append(newPlayer)
+        #if it does already exist drop with failure code
+        else:
+            connection.sendall(b'FAILURE')
+            connection.close()
 
     #def query_players():
 
