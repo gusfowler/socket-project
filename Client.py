@@ -38,7 +38,7 @@ class Server (threading.Thread):
         self.serverAddress = (ip, port)
         self.ID = threadID
         self.myUserName = user
-        print("connecting to server ", ip, " on port ", port, " and thread ", self.ID)
+        print(self.myUserName, " connecting to server ", ip, " on port ", port, " and thread ", self.ID)
 
         self.sock.connect(self.serverAddress)
         self.sock.sendall(user.encode())
