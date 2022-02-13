@@ -44,7 +44,9 @@ class Server (threading.Thread):
         self.sock.sendall(user.encode())
 
         while self.flag:
-            print(self.sock.recv(1024))
+            data = self.sock.recv(1024)
+            if len(data) > 0:
+                print(data)
 
 class Player:
     flag = True

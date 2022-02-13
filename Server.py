@@ -86,7 +86,7 @@ class Manager:
         #create and register new player if name is not present
         if not nameExists: 
             newPlayer = Player(name, address, connection, threading.activeCount() + 1)
-            self.listOfPlayers.append(newPlayer)
+            self.arrPlayers.append(newPlayer)
         #if it does already exist drop with failure code
         else:
             connection.sendall(b'FAILURE')
