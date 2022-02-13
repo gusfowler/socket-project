@@ -34,7 +34,7 @@ class Player (threading.Thread):
         self.connection = conn
         self.ID = threadID
 
-        print("New Player ", name, " at ip ", ip)
+        print("New Player ", name, " at ip ", ip, " on thread # ", self.ID)
         self.sendMsg(b'ACK')
 
     def sendMsg(self, data):
@@ -66,7 +66,7 @@ class Manager:
             self.server.listen()
             connection, address = self.server.accept()
 
-            newPlayer = Player(str(repr(connection.recv(1024))), address, connection)
+            newPlayer = Player(str(repr(connection.recv(1024))), address, connection, threading.currentThread() + 1)
             self.listOfPlayers.append(newPlayer)
             
 

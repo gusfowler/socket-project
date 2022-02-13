@@ -26,13 +26,18 @@ serverPort = 0
 def display_commands(self):
         print("Help Page goes here")
 
-class Server:
+class Server (threading.Thread):
     flag = True
+    ID = 0
+    myUserName = ''
 
-    def __init__(self, ip, port, user):
-        print("connecting to server ", ip, " on port ", port)
+    def __init__(self, ip, port, user, threadID):
+        threading.Thread.__init__(self)
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.serverAddress = (ip, port)
+        self.ID = threadID
+        self.myUserName = user
+        print("connecting to server ", ip, " on port ", port, " and thread ", self.ID)
 
         self.sock.connect(self.serverAddress)
         self.sock.sendall(user.encode())
@@ -66,6 +71,6 @@ while True:
     if cmd[0] == 'register':
         serverIP = cmd[2]
         serverPort = int(cmd[3])
-        server = Server(serverIP, serverPort, cmd[1])
+        server = Server(serverIP, serverPort, cmd[1], )
     elif cmd[0] == 'help':
         display_commands()
