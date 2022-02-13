@@ -71,9 +71,6 @@ class Manager:
             #attempt to register all connections
             self.register(address, connection)
 
-            
-            
-
     ## MILESTONE REQUIREMENTS
     def register(self, address, connection):
         #check if user with same name exists

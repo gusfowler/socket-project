@@ -62,6 +62,7 @@ class Server (threading.Thread):
     def recvMsg(self):
         return self.sock.recv(1024)
 
+#p2p - UDP class
 class Player:
     flag = True
 
@@ -71,11 +72,11 @@ class Player:
         self.serverAddress = (hostIP, hostPort)
     
     def listen(self, port):
-        sock = socket.socket(socket.AF_INET, socket. SOCK_DGRAM)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:
             sock.bind((socket.gethostname(), port))
         except:
-            s = socket.socket(socket.AF_INET, socket. SOCK_DGRAM)
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             s.connect((self.hostIP, port))
             #sock.bind((s.getsockname() [8], port))
         while self.flag:
