@@ -14,7 +14,6 @@ while flag:
     serverSocket,sendto(modifiedMessage,encode(),clientAddress)
 '''
 
-from asyncio.windows_events import NULL
 import pickle
 import socket
 import threading
@@ -24,7 +23,7 @@ class Player (threading.Thread):
 
     playerName = ''
     playerIP = ''
-    connection = NULL
+    connection = 0
     ID = 0
 
     def __init__(self, name, ip, conn, threadID):
