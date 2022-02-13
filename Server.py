@@ -17,17 +17,22 @@ while flag:
 from asyncio.windows_events import NULL
 import pickle
 import socket
+import threading
+import time
 
-class Player:
+class Player (threading.Thread):
 
     playerName = ''
     playerIP = ''
     connection = NULL
+    ID = 0
 
-    def __init__(self, name, ip, conn):
+    def __init__(self, name, ip, conn, threadID):
+        threading.Thread.__init__(self)
         self.playerName = name
         self.playerIP = ip
         self.connection = conn
+        self.ID = threadID
 
         print("New Player ", name, " at ip ", ip)
         self.sendMsg(b'ACK')

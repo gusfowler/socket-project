@@ -17,9 +17,14 @@ from atexit import register
 import pickle
 import socket
 import sys
+import threading
+import time
 
 serverIP = ""
 serverPort = 0
+
+def display_commands(self):
+        print("Help Page goes here")
 
 class Server:
     flag = True
@@ -55,9 +60,6 @@ class Player:
             raw_bytes, addr = sock.recvfrom(1024)
             data = pickle.loads(raw_bytes)
 
-    def display_commands(self):
-        print("Help Page goes here")
-
 while True:
     command = input('enter command: ')
     cmd = command.split(" ")
@@ -65,3 +67,5 @@ while True:
         serverIP = cmd[2]
         serverPort = int(cmd[3])
         server = Server(serverIP, serverPort, cmd[1])
+    elif cmd[0] == 'help':
+        display_commands()
