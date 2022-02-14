@@ -23,9 +23,14 @@ import time
 serverIP = ""
 serverPort = 0
 currentServer = ''
+fellowPlayers = []
 
 def display_commands():
         print("Help Page goes here")
+
+def printPlayers():
+    print("Name:\tIP Address\tPort")
+    for player in fellowPlayers: player.print()
 
 class Server (threading.Thread):
     flag = True
@@ -80,7 +85,20 @@ class Server (threading.Thread):
         ###
         data = self.recvMsg()
         numPlayers = int(data.decode('utf-8'))
+        print(numPlayers)
         self.sendMsg(b'ACK')
+
+        for x in range(0, numPlayers):
+            print(x)
+            name = self.recvMsg().decode('utf-8')
+            self.sendMsg(b'ACK')
+            ip = self.recvMsg().decode('utf-8')
+            self.sendMsg(b'ACK')
+            port = self.recvMsg().decode('utf-8')
+            self.sendMsg(b'ACK')
+            newPlayer = Player(name, ip, port)
+            fellowPlayers.append(newPlayer)
+            self.sendMsg(b'ACK')
 
     def sendMsg(self, msg):
         self.sock.sendall(msg)
@@ -96,23 +114,20 @@ class Server (threading.Thread):
 #p2p - UDP class
 class Player:
     flag = True
+    playerName = ''
+    addrIP = ''
+    addrPort = ''
 
-    def __init__(self, hostIP, hostPort):
-        print("connecting to ", hostIP, " on port ", hostPort)
-        self.sock = socket.socket(socket.AF_INET, socket. SOCK_DGRAM)
-        self.serverAddress = (hostIP, hostPort)
-    
-    def listen(self, port):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        try:
-            sock.bind((socket.gethostname(), port))
-        except:
-            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            s.connect((self.hostIP, port))
-            #sock.bind((s.getsockname() [8], port))
-        while self.flag:
-            raw_bytes, addr = sock.recvfrom(1024)
-            data = pickle.loads(raw_bytes)
+    def __init__(self, name, hostIP, hostPort):
+        print("connecting to ", name, " at ip ", hostIP, " using port ", hostPort)
+        self.playerName = name
+        self.addrIP = hostIP
+        self.addrPort = hostPort
+        #self.sock = socket.socket(socket.AF_INET, socket. SOCK_DGRAM)
+        #self.serverAddress = (hostIP, hostPort)                        not to UDP p2p yet
+
+    def print(self):
+        print(self.playerName, ":\t", self.addrIP, "\t", self.addrPort)
 
 while True:
     command = input('enter command: ')
@@ -122,9 +137,8 @@ while True:
         serverPort = int(cmd[3])
         currentServer = Server(serverIP, serverPort, cmd[1], threading.activeCount() + 1)
     elif cmd[0] == "query":
-        print("got cmd0")
         if cmd[1] == "players":
-            print("got cmd1")
             currentServer.query_players()
+            printPlayers()
     elif cmd[0] == 'help':
         display_commands()

@@ -61,7 +61,27 @@ class Player (threading.Thread):
         if not (self.recvMsg() == b'ACK'):
             print("did not acknowledge number of players for client loop")
         else:
-            
+            for x in range(0, numPlayers):
+                player = self.myManager.getPlayerAt(x)
+                if player != -1:
+                    while True:
+                        self.sendMsg(player.playerName.encode('utf-8'))
+                        if not b'ACK' == self.recvMsg(): continue
+                        else: break
+                    while True:
+                        self.sendMsg(player.playerIP[0].encode('utf-8'))
+                        if not b'ACK' == self.recvMsg(): continue
+                        else: break
+                    while True:
+                        self.sendMsg(str(player.playerIP[1]).encode('utf-8'))
+                        if not b'ACK' == self.recvMsg(): continue
+                        else: break
+                print("waiting on ack")
+                if self.recvMsg() == b'ACK': continue
+                else:
+                    print("did not acknowledge reciept of player")
+                    break
+
 
     def sendMsg(self, data):
         self.connection.sendall(data)
@@ -119,6 +139,19 @@ class Manager:
 
     def getNumPlayers(self):
         return len(self.arrPlayers)
+
+    def getPlayerAt(self, num):
+        return self.arrPlayers[num]
+
+    def getPlayerByName(self, name):
+        found = False
+        for player in self.arrPlayers:
+            if player.playerName == name:
+                found = True
+                return player
+        if not found:
+            print("Searched arrPlayers for nonexisitant player")
+            return -1
     #def query_players():
 
     #def query_games():
