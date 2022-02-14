@@ -26,10 +26,12 @@ class Player (threading.Thread):
     playerName = ''
     playerIP = ''
     connection = 0
+    myManager = ''
     ID = 0
 
-    def __init__(self, name, ip, conn, threadID):
+    def __init__(self, manager, name, ip, conn, threadID):
         threading.Thread.__init__(self)
+        self.myManager = manager
         self.playerName = name
         self.playerIP = ip
         self.connection = conn
@@ -45,11 +47,20 @@ class Player (threading.Thread):
             if self.recieveFlag:
                 data = self.recvMsg()
                 if len(data) > 0:
-                    if data == b'QUERY':
-                        self.sendMsg(b'QUERY WHAT')
+                    if data == b'QUERY PLAYERS':
+                        self.sendPlayers()
                 else:
                     print("no data")
                     break
+    
+    def sendPlayers(self):
+        ###
+        numPlayers = self.myManager.getNumPlayers()
+        print(str(numPlayers).encode('utf-8'), numPlayers)
+        self.sendMsg(str(numPlayers).encode('utf-8'))
+        if not (self.recvMsg() == b'ACK'):
+            print("did not acknowledge number of players for client loop")
+        else:
             
 
     def sendMsg(self, data):
@@ -66,7 +77,7 @@ class Manager:
     flag = True
 
     arrPlayers = []
-    activeGames = {}
+    activeGames = []
 
     serverHost = '10.0.0.170'
     serverPort = 0
@@ -99,13 +110,15 @@ class Manager:
 
         #create and register new player if name is not present
         if not nameExists: 
-            newPlayer = Player(name, address, connection, threading.activeCount() + 1)
+            newPlayer = Player(self, name, address, connection, threading.activeCount() + 1)
             self.arrPlayers.append(newPlayer)
         #if it does already exist drop with failure code
         else:
             connection.sendall(b'FAILURE')
             connection.close()
 
+    def getNumPlayers(self):
+        return len(self.arrPlayers)
     #def query_players():
 
     #def query_games():

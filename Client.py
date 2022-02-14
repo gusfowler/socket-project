@@ -66,20 +66,21 @@ class Server (threading.Thread):
                         print("Failed to register with server, probably because I am using the same name of someone already registered. New name?")
                     elif data == b'GOODBYE':
                         print("Server Closed?")
-                    elif data == b'QUERY WHAT':
-                        if self.queryPlayers:
-                            self.sendMsg(b'PLAYERS')
                         continue
                     else:
                         print("Unknown what was recieved")
                 self.recieveFlag = False
             
             if self.queryPlayers:
-                self.sendMsg(b'QUERY')
+                self.sendMsg(b'QUERY PLAYERS')
                 print("sent ", b'QUERY')
-                if data == b'QUERY WHAT':
-                    print("sent ", b'PLAYERS')
-                    self.sendMsg(b'PLAYERS')
+                self.recievePlayers()
+
+    def recievePlayers(self):
+        ###
+        data = self.recvMsg()
+        numPlayers = int(data.decode('utf-8'))
+        self.sendMsg(b'ACK')
 
     def sendMsg(self, msg):
         self.sock.sendall(msg)
