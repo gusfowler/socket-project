@@ -20,6 +20,8 @@ import threading
 import time
 
 class Player (threading.Thread):
+    flag = True
+    recieveFlag = False
 
     playerName = ''
     playerIP = ''
@@ -32,12 +34,27 @@ class Player (threading.Thread):
         self.playerIP = ip
         self.connection = conn
         self.ID = threadID
+        self.start()
 
-        print("New Player ", name, " at ip ", ip, " on thread # ", self.ID)
+    def run(self):
+        print("New Player ", self.playerName, " at ip ", self.playerIP, " on thread # ", self.ID)
         self.sendMsg(b'SUCCESS')
+
+        while self.flag:
+            data = b''
+            if self.recieveFlag:
+                data = self.recvMsg()
+                if len(data) > 0:
+                    if data == b'QUERY':
+                        self.sendMsg(b'QUERY WHAT')
+                else:
+                    print("no data")
+                    break
+            
 
     def sendMsg(self, data):
         self.connection.sendall(data)
+        self.recieveFlag = True
 
     def recvMsg(self):
         return self.connection.recv(1024)

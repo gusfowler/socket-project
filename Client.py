@@ -24,43 +24,73 @@ serverIP = ""
 serverPort = 0
 currentServer = ''
 
-def display_commands(self):
+def display_commands():
         print("Help Page goes here")
 
 class Server (threading.Thread):
     flag = True
-    ID = 0
+    recieveFlag = True #want to always recieve the first run on registering
+
     myUserName = ''
+    ID = 0
+
+    queryPlayers = False
 
     def __init__(self, ip, port, user, threadID):
         threading.Thread.__init__(self)
         #TCP SOCKET CONNECT
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.serverAddress = (ip, port)
-        self.ID = threadID
         self.myUserName = user
-        print(self.myUserName, " connecting to server ", ip, " on port ", port, " and thread ", self.ID)
+        self.ID = threadID
+        self.start()
+
+    def __del__(self):
+        self.sock.close()
+    
+    #function run in new thread
+    def run(self):
+        print(self.myUserName, " connecting to server ", serverIP, " on port ", serverPort, "on thread #", self.ID)
 
         self.sock.connect(self.serverAddress)
-        self.sendMsg(user.encode())
+        self.sendMsg(self.myUserName.encode())
 
         while self.flag:
-            data = self.recvMsg()
-            if len(data) > 0:
-                if data == b'SUCCESS':
-                    print("Successfully registered with ", serverIP, " on port ", serverPort)
-                elif data == b'FAILURE':
-                    print("Failed to register with server, probably because I am using the same name of someone already registered. New name?")
-                else:
-                    print("Unknown what was recieved")
-            else:
-                break
+            data = b''
+            if self.recieveFlag:
+                data = self.recvMsg()
+                if len(data) > 0:
+                    if data == b'SUCCESS':
+                        print("Successfully registered with ", serverIP, " on port ", serverPort)
+                    elif data == b'FAILURE':
+                        print("Failed to register with server, probably because I am using the same name of someone already registered. New name?")
+                    elif data == b'GOODBYE':
+                        print("Server Closed?")
+                    elif data == b'QUERY WHAT':
+                        if self.queryPlayers:
+                            self.sendMsg(b'PLAYERS')
+                        continue
+                    else:
+                        print("Unknown what was recieved")
+                self.recieveFlag = False
+            
+            if self.queryPlayers:
+                self.sendMsg(b'QUERY')
+                print("sent ", b'QUERY')
+                if data == b'QUERY WHAT':
+                    print("sent ", b'PLAYERS')
+                    self.sendMsg(b'PLAYERS')
 
     def sendMsg(self, msg):
         self.sock.sendall(msg)
+        self.recieveFlag = True
 
     def recvMsg(self):
+        self.recieveFlag = False
         return self.sock.recv(1024)
+
+    def query_players(self):
+        self.queryPlayers = True
 
 #p2p - UDP class
 class Player:
@@ -90,5 +120,10 @@ while True:
         serverIP = cmd[2]
         serverPort = int(cmd[3])
         currentServer = Server(serverIP, serverPort, cmd[1], threading.activeCount() + 1)
+    elif cmd[0] == "query":
+        print("got cmd0")
+        if cmd[1] == "players":
+            print("got cmd1")
+            currentServer.query_players()
     elif cmd[0] == 'help':
         display_commands()
