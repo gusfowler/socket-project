@@ -49,6 +49,8 @@ class Player (threading.Thread):
                 if len(data) > 0:
                     if data == b'QUERY PLAYERS':
                         self.sendPlayers()
+                    if data == b'QUERY GAMES':
+                        self.sendMsg(b'NO GAMES')
                 else:
                     print("no data")
                     break

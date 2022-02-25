@@ -40,6 +40,7 @@ class Server (threading.Thread):
     ID = 0
 
     queryPlayers = False
+    queryGames = False
 
     def __init__(self, ip, port, user, threadID):
         threading.Thread.__init__(self)
@@ -72,6 +73,9 @@ class Server (threading.Thread):
                     elif data == b'GOODBYE':
                         print("Server Closed?")
                         continue
+                    elif data == b'NO GAMES':
+                        print("No games running")
+                        self.queryGames = False
                     else:
                         print("Unknown what was recieved")
                 self.recieveFlag = False
@@ -80,6 +84,9 @@ class Server (threading.Thread):
                 self.sendMsg(b'QUERY PLAYERS')
                 print("sent ", b'QUERY')
                 self.recievePlayers()
+
+            if self.queryGames:
+                self.sendMsg(b'QUERY GAMES')
 
     def recievePlayers(self):
         ###
@@ -140,5 +147,7 @@ while True:
         if cmd[1] == "players":
             currentServer.query_players()
             printPlayers()
+        elif cmd[1] == "games":
+            currentServer.queryGames = True
     elif cmd[0] == 'help':
         display_commands()
