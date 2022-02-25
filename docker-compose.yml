@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+    server:
+      image: "python:3.7-alpine"
+      volume: 
+        - ./code:/code
+      stdin_open: true
+      tty: true
+    client1:
+      image: "python:3.7-alpine"
+      volume: 
+        - ./code:/code
+      stdin_open: true
+      tty: true
+    client2:
+      image: "python:3.7-alpine"
+      volume: 
+        - ./code:/code
+      stdin_open: true
+      tty: true
+    client3:
+      image: "python:3.7-alpine"
+      volume: 
+        - ./code:/code
+      stdin_open: true
+      tty: true
+      
