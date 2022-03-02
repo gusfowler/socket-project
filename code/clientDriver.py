@@ -16,7 +16,7 @@ PORT = 5000
 
 sleep(3)
 print("My IP is:\t", IP)
-IP = socket.gethostbyname("socket-project-server-1")
+IP = socket.gethostbyname("socket-project_server_1")
 #IP = '172.19.0.3'
 print("Server IP is:\t", IP)
 server = Connection.Client(IP, PORT)
@@ -30,4 +30,4 @@ while True:
         for msg in current:
             server.recvBuffer.remove(msg)
         server.sendBuffer.append("Recvieved!")
-    sleep(10)
+    sleep(3)

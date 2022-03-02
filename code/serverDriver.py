@@ -16,12 +16,11 @@ PORT = 5000
 print("My IP is:\t", IP)
 server = Connection.Server(IP, PORT)
 
-count = 1
+count = 0
 while True:
-    server.sendToAll('hello world!')
-    server.sendToAll(str(count))
+    count += 1
+    sleep(3)
+    server.sendToAll('hello world! ' + str(count))
     msgs = server.getMsgs()
     if len(msgs) > 0:
         print(msgs)
-    sleep(10)
-    count += 1

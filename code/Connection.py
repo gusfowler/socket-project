@@ -27,6 +27,7 @@ class Server(threading.Thread):
             while self.listenFlag:
                 #print(counter)
                 if len(self.sendBuffer) > 0:
+                    print("Server sendBuffer:\t", self.sendBuffer)
                     self.sendMsg(self.sendBuffer)
 
                 if self.recv: 
