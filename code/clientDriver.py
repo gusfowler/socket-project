@@ -1,4 +1,6 @@
 import sys
+import socket
+from time import sleep
 
 import Connection
 
@@ -12,8 +14,20 @@ PORT = 5000
 #        elif arg == '-p':
 #            PORT = sys.argv[sys.argv.where('-p') + 1]
 
+sleep(3)
 print("My IP is:\t", IP)
+IP = socket.gethostbyname("socket-project-server-1")
+#IP = '172.19.0.3'
+print("Server IP is:\t", IP)
 server = Connection.Client(IP, PORT)
 
 while True:
-    print(server.recvMsgs())
+    if len(server.recvBuffer) > 0: 
+        current = []
+        for msg in server.recvBuffer:
+            current.append(msg)
+        print("Driver:\t", server.recvBuffer)
+        for msg in current:
+            server.recvBuffer.remove(msg)
+        server.sendBuffer.append("Recvieved!")
+    sleep(10)

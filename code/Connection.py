@@ -1,10 +1,8 @@
-from curses.ascii import DEL
 import socket
-import sys
 import threading
-import time
 
 DELIMITER = "\t"
+ENCODING = 'utf-8'
 
 def getIP():
     return socket.gethostbyname(socket.gethostname())
@@ -20,27 +18,45 @@ class Server(threading.Thread):
 
             self.recvBuffer = []
             self.sendBuffer = []
-
+            self.recv = False
             self.listenFlag = True
             self.start()
 
         def run(self):
+            counter = 0
             while self.listenFlag:
-                print(None)
+                #print(counter)
                 if len(self.sendBuffer) > 0:
                     self.sendMsg(self.sendBuffer)
 
-                self.recvBuffer.append(str for msg in self.recvMsg())
+                if self.recv: 
+                    for msg in self.recvMsg(): self.recvBuffer.append(msg)
+                counter += 1
 
         def sendMsg(self, msgs):
+            output = b''
+            nextSend = []
+
             for msg in msgs:
-                self.connection.sendall(msg + DELIMITER)
+                if len(output + bytes(msg + DELIMITER, ENCODING)) <= 1024:
+                    output += bytes(msg + DELIMITER, ENCODING)
+                else:
+                    nextSend.append(msg)
+                self.sendBuffer.remove(msg)
+
+            msgs = nextSend
+            self.connection.sendall(output)
+            self.recv = True
 
         def recvMsg(self):
+            output = []
             data = self.connection.recv(1024)
-            string = repr(data)
+            string = str(data, ENCODING)
 
-            return [str for s in string.split(DELIMITER)]
+            for s in string.split(DELIMITER):
+                if s != '': output.append(s)
+
+            return output
 
 
     def __init__(self, ipAddr, port):
@@ -49,6 +65,7 @@ class Server(threading.Thread):
         self.arrClients = []
 
         self.address = (ipAddr, port)
+        print("Server starting on ", self.address)
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.listenFlag = True
         self.start()
@@ -69,8 +86,8 @@ class Server(threading.Thread):
         output = []
         for client in self.arrClients:
             msgs = client.recvBuffer
-
-            output.append(client.address + ": " + str for s in msgs)
+            for msg in client.recvBuffer:
+                output.append((client.address, msg))
         return output
 
     def sendMsg(self, client, msg):
@@ -97,6 +114,7 @@ class Client(threading.Thread):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.address = (ipAddr, port)
         self.keepAlive = True
+        self.recv = True
 
         self.start()
 
@@ -105,18 +123,35 @@ class Client(threading.Thread):
 
         while self.keepAlive:
             if len(self.sendBuffer) > 0:
-                self.sendMsgs()
-            self.recvBuffer.append(str for s in self.recvMsgs())
+                self.sendMsgs(self.sendBuffer)
+            if self.recv: 
+                for s in self.recvMsgs():
+                    if s != '':
+                        self.recvBuffer.append(s)
 
-    def sendMsgs(self):
-        for msg in self.sendBuffer:
-            self.sock.sendall(msg + DELIMITER)
+    def sendMsgs(self, msgs):
+        output = b''
+        nextSend = []
+
+        for msg in msgs:
+            if len(output + bytes(msg + DELIMITER, ENCODING)) <= 1024:
+                output += bytes(msg + DELIMITER, ENCODING)
+            else:
+                nextSend.append(msg)
+            self.sendBuffer.remove(msg)
+
+        msgs = nextSend
+        self.sock.sendall(output)
+        self.recv = True
+
 
     def recvMsgs(self):
         data = self.sock.recv(1024)
-        string = repr(data)
+        string = str(data, ENCODING)
 
-        return [str for s in string.split(DELIMITER)]
+        if data: self.recv = False
+
+        return string.split(DELIMITER)
 
 ##UDP Peer
 #class Peer(threading.Thread):
