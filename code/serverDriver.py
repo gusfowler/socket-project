@@ -18,8 +18,10 @@ server = Connection.Server(IP, PORT)
 
 count = 1
 while True:
-    server.sendToAll('hello world!\t' + str(count))
+    server.sendToAll('hello world!')
+    server.sendToAll(str(count))
     msgs = server.getMsgs()
     if len(msgs) > 0:
         print(msgs)
     sleep(10)
+    count += 1

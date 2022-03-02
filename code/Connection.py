@@ -86,8 +86,9 @@ class Server(threading.Thread):
         output = []
         for client in self.arrClients:
             msgs = client.recvBuffer
-            for msg in client.recvBuffer:
+            for msg in msgs:
                 output.append((client.address, msg))
+                client.recvBuffer.remove(msg)
         return output
 
     def sendMsg(self, client, msg):
