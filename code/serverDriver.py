@@ -18,9 +18,12 @@ server = Connection.Server(IP, PORT)
 
 count = 0
 while True:
-    count += 1
-    sleep(3)
-    server.sendToAll('hello world! ' + str(count))
-    msgs = server.getMsgs()
-    if len(msgs) > 0:
-        print(msgs)
+    num = server.getNumClients()
+    while num > 0:
+        count += 1
+        sleep(3)
+        print("Loop count:\t", count, " Num Clients:\t", num)
+        server.sendToAll('hello world! ' + str(count))
+        msgs = server.getMsgs()
+        if len(msgs) > 0:
+            print(msgs)

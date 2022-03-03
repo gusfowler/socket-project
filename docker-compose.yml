@@ -14,3 +14,24 @@ services:
       entrypoint: python /code/clientDriver.py
       stdin_open: true
       tty: true
+    client2:
+      image: "python:3.7-alpine"
+      volumes: 
+        - ./code:/code
+      entrypoint: python /code/clientDriver.py
+      stdin_open: true
+      tty: true
+    client3:
+      image: "python:3.7-alpine"
+      volumes: 
+        - ./code:/code
+      entrypoint: python /code/clientDriver.py
+      stdin_open: true
+      tty: true
+    client4:
+      image: "python:3.7-alpine"
+      volumes: 
+        - ./code:/code
+      entrypoint: python /code/clientDriver.py
+      stdin_open: true
+      tty: true

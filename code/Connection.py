@@ -1,5 +1,6 @@
 import socket
 import threading
+from time import sleep
 
 DELIMITER = "\t"
 ENCODING = 'utf-8'
@@ -25,7 +26,7 @@ class Server(threading.Thread):
         def run(self):
             counter = 0
             while self.listenFlag:
-                #print(counter)
+                print(self.address, "Run Loop Count:\t", counter)
                 if len(self.sendBuffer) > 0:
                     print("Server sendBuffer:\t", self.sendBuffer)
                     self.sendMsg(self.sendBuffer)
@@ -33,6 +34,7 @@ class Server(threading.Thread):
                 if self.recv: 
                     for msg in self.recvMsg(): self.recvBuffer.append(msg)
                 counter += 1
+                sleep(3)
 
         def sendMsg(self, msgs):
             output = b''
@@ -43,6 +45,7 @@ class Server(threading.Thread):
                     output += bytes(msg + DELIMITER, ENCODING)
                 else:
                     nextSend.append(msg)
+                    print("added to nextSend\t", msg)
                 self.sendBuffer.remove(msg)
 
             msgs = nextSend
@@ -103,6 +106,9 @@ class Server(threading.Thread):
     def sendToAll(self, msg):
         for client in self.arrClients:
             client.sendBuffer.append(msg)
+
+    def getNumClients(self):
+        return len(self.arrClients)
 
 ##TCP Client
 class Client(threading.Thread):
