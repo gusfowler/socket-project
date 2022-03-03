@@ -21,6 +21,7 @@ IP = socket.gethostbyname("socket-project_server_1")
 print("Server IP is:\t", IP)
 server = Connection.Client(IP, PORT)
 
+count = 0 
 while True:
     if len(server.recvBuffer) > 0: 
         current = []
@@ -29,5 +30,6 @@ while True:
         print("Driver:\t", server.recvBuffer)
         for msg in current:
             server.recvBuffer.remove(msg)
-        server.sendBuffer.append("Recvieved!")
+            count += 1
+        server.sendBuffer.append("Recvieved! " + str(count))
     sleep(3)

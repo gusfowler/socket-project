@@ -26,7 +26,6 @@ class Server(threading.Thread):
         def run(self):
             counter = 0
             while self.listenFlag:
-                print(self.address, "Run Loop Count:\t", counter)
                 if len(self.sendBuffer) > 0:
                     print("Server sendBuffer:\t", self.sendBuffer)
                     self.sendMsg(self.sendBuffer)
@@ -38,18 +37,26 @@ class Server(threading.Thread):
 
         def sendMsg(self, msgs):
             output = b''
+            sent = []
             nextSend = []
 
             for msg in msgs:
+
                 if len(output + bytes(msg + DELIMITER, ENCODING)) <= 1024:
                     output += bytes(msg + DELIMITER, ENCODING)
+                    
                 else:
                     nextSend.append(msg)
-                    print("added to nextSend\t", msg)
+                    
+                sent.append(msg)
+
+            #do this to not introduce skipping in above for loop- messages finally sent in order
+            for msg in sent:
                 self.sendBuffer.remove(msg)
 
             msgs = nextSend
             self.connection.sendall(output)
+            
             self.recv = True
 
         def recvMsg(self):
@@ -104,6 +111,7 @@ class Server(threading.Thread):
                 return client
 
     def sendToAll(self, msg):
+        print("hit here")
         for client in self.arrClients:
             client.sendBuffer.append(msg)
 
