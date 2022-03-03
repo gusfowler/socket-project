@@ -39,7 +39,7 @@ class Server(threading.Thread):
             output = b''
             sent = []
             nextSend = []
-
+            print("hit here")
             for msg in msgs:
 
                 if len(output + bytes(msg + DELIMITER, ENCODING)) <= 1024:
@@ -111,7 +111,6 @@ class Server(threading.Thread):
                 return client
 
     def sendToAll(self, msg):
-        print("hit here")
         for client in self.arrClients:
             client.sendBuffer.append(msg)
 
@@ -147,6 +146,7 @@ class Client(threading.Thread):
 
     def sendMsgs(self, msgs):
         output = b''
+        sent = []
         nextSend = []
 
         for msg in msgs:
@@ -154,6 +154,9 @@ class Client(threading.Thread):
                 output += bytes(msg + DELIMITER, ENCODING)
             else:
                 nextSend.append(msg)
+            sent.append(msg)
+
+        for msg in sent:
             self.sendBuffer.remove(msg)
 
         msgs = nextSend
