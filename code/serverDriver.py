@@ -25,4 +25,4 @@ while True:
         msgs = server.getMsgs()
         if len(msgs) > 0:
             print(msgs)
-        sleep(3)    #SLEEP is essential - > if I try to flood something in the OS kills the thread
+        sleep(Connection.SLEEP_TIME)    #SLEEP is essential - > if I try to flood something in the OS kills the thread

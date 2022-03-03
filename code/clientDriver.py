@@ -32,4 +32,4 @@ while True:
             server.recvBuffer.remove(msg)
             count += 1
         server.sendBuffer.append("Recvieved! " + str(count))
-    sleep(3)
+    sleep(Connection.SLEEP_TIME)

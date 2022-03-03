@@ -4,6 +4,7 @@ from time import sleep
 
 DELIMITER = "\t"
 ENCODING = 'utf-8'
+SLEEP_TIME = 1
 
 def getIP():
     return socket.gethostbyname(socket.gethostname())
@@ -33,7 +34,7 @@ class Server(threading.Thread):
                 if self.recv: 
                     for msg in self.recvMsg(): self.recvBuffer.append(msg)
                 counter += 1
-                sleep(3)
+                sleep(SLEEP_TIME)
 
         def sendMsg(self, msgs):
             output = b''
