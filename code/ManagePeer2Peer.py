@@ -22,7 +22,7 @@ class Manager(threading.Thread):
             self.Peers = []
 
     def findPlayer(self, name):
-        for player in players:
+        for player in self.players:
             if player.name == name:
                 return player
         return -1
@@ -60,8 +60,8 @@ class Manager(threading.Thread):
             for msg in incomingMessages:
                 if 'REGISTER' in msg[1]:
                     register = msg[1].split(' ')
-                    if findPlayer(register[1]) == -1:
-                        self.players.append(Player(msg[0], register[1]))
+                    if self.findPlayer(register[1]) == -1:
+                        self.players.append(self.Player(msg[0], register[1]))
                         self.server.sendMsg(msg[0], "SUCCESS")
                     else:
                         self.server.sendMsg(msg[0], "FAILURE")

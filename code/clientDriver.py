@@ -6,7 +6,7 @@ import Connection
 #from ManagePeer2Peer import Player
 
 IP = Connection.getIP()
-PORT = 5000
+PORT = 23000
 
 #if len(sys.argv > 0):
 #    for arg in sys.argv:
@@ -22,9 +22,9 @@ IP = socket.gethostbyname("socket-project_server_1")
 print("Server IP is:\t", IP)
 server = Connection.Client(IP, PORT)
 
-count = 0 
+
 while True:
     if len(server.recvBuffer) > 0: 
         print("Driver:\t", server.getMsgs())
-        server.sendMsg("Recvieved! " + str(count))
+        server.sendMsg("REGISTER gus")
     sleep(Connection.SLEEP_TIME)

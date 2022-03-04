@@ -119,9 +119,6 @@ class Server(threading.Thread):
     def sendMsg(self, address, msg):
         self.getClient(address).sendBuffer.append(msg)
 
-    def sendMsg(self, client, msg):
-        client.sendBuffer.append(msg)
-
     def getClient(self, address):
         for client in self.arrClients:
             if client.address == address:
