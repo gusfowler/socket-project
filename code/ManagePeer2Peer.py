@@ -58,6 +58,7 @@ class Manager(threading.Thread):
             incomingMessages = self.server.getMsgs()
 
             for msg in incomingMessages:
+                if msg[0][1] not in PORTS_USED: PORTS_USED.append(msg[0][1])
                 if 'REGISTER' in msg[1]:
                     register = msg[1].split(' ')
                     if self.findPlayer(register[1]) == -1:

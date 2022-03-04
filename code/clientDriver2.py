@@ -1,12 +1,13 @@
 import sys
 import socket
 from time import sleep
+from ManagePeer2Peer import PORT_LOWER_BOUND
 
 import Connection
 #from ManagePeer2Peer import Player
 
 IP = Connection.getIP()
-PORT = 23000
+PORT = PORT_LOWER_BOUND
 
 #if len(sys.argv > 0):
 #    for arg in sys.argv:
