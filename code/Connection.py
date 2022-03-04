@@ -59,10 +59,14 @@ class Server(threading.Thread):
             print("New Client:\t", address)
 
             self.recvBuffer = []
-            self.sendBuffer = []
+            self.sendBuffer = [ "hello!"]
             self.recv = False
             self.listenFlag = True
             self.start()
+
+        def __del__(self):
+            self.listenFlag = False
+            self.connection.close()
 
         def run(self):
             counter = 0
@@ -85,7 +89,7 @@ class Server(threading.Thread):
 
         self.arrClients = []
 
-        self.address = (ipAddr, port)
+        self.address = (ipAddr, int(port))
         print("Server starting on ", self.address)
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.listenFlag = True
@@ -112,6 +116,9 @@ class Server(threading.Thread):
                 client.recvBuffer.remove(msg)
         return output
 
+    def sendMsg(self, address, msg):
+        self.getClient(address).sendBuffer.append(msg)
+
     def sendMsg(self, client, msg):
         client.sendBuffer.append(msg)
 
@@ -126,6 +133,10 @@ class Server(threading.Thread):
 
     def getNumClients(self):
         return len(self.arrClients)
+
+    def drop(self, address):
+        self.arrClients.remove(self.getClient(address))
+
 
 ##TCP Client
 class Client(threading.Thread):
@@ -154,16 +165,27 @@ class Client(threading.Thread):
                     if s != '':
                         self.recvBuffer.append(s)
 
+    def getMsgs(self):
+        output = []
+        msgs = self.recvBuffer
+        for msg in msgs:
+            output.append(msg)
+            self.recvBuffer.remove(msg)
+        return output
 
-##UDP Peer
-#class Peer(threading.Thread):
+    def sendMsg(self, msg):
+        self.sendBuffer.append(msg)
+
+
+# #UDP Peer
+# class Peer(threading.Thread):
 
 #    def __init__(self, ipAddr, port):
 #        threading.Thread.__init__(self)
-#
+
 #        self.address = (ipAddr, port)
 #        self.start()
 
 #    def run(self):
-        ##do stuff
+#         #do stuff
 

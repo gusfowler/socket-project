@@ -3,6 +3,7 @@ import socket
 from time import sleep
 
 import Connection
+#from ManagePeer2Peer import Player
 
 IP = Connection.getIP()
 PORT = 5000
@@ -24,12 +25,6 @@ server = Connection.Client(IP, PORT)
 count = 0 
 while True:
     if len(server.recvBuffer) > 0: 
-        current = []
-        for msg in server.recvBuffer:
-            current.append(msg)
-        print("Driver:\t", server.recvBuffer)
-        for msg in current:
-            server.recvBuffer.remove(msg)
-            count += 1
-        server.sendBuffer.append("Recvieved! " + str(count))
+        print("Driver:\t", server.getMsgs())
+        server.sendMsg("Recvieved! " + str(count))
     sleep(Connection.SLEEP_TIME)
