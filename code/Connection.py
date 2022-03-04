@@ -9,6 +9,12 @@ SLEEP_TIME = 1
 def getIP():
     return socket.gethostbyname(socket.gethostname())
 
+'''
+    These are universal send and recvieve functions that should work for both TCP and UDP sockets.
+    Now we just need to handle the creation of the UDP socket and the multithreading for that class.
+    Within the Peer class, the socket variable needs to be named connection, and the send buffer sendBuffer,
+    and the recieve buffer needs to be named recvBuffer.
+'''
 def sendMsg(msgs, selfSock):
     output = b''
     sent = []
