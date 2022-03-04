@@ -70,40 +70,6 @@ class Server(threading.Thread):
                 counter += 1
                 sleep(SLEEP_TIME)
 
-        # def sendMsg(self, msgs):
-        #     output = b''
-        #     sent = []
-        #     nextSend = []
-        #     print("hit here")
-        #     for msg in msgs:
-
-        #         if len(output + bytes(msg + DELIMITER, ENCODING)) <= 1024:
-        #             output += bytes(msg + DELIMITER, ENCODING)
-                    
-        #         else:
-        #             nextSend.append(msg)
-                    
-        #         sent.append(msg)
-
-        #     #do this to not introduce skipping in above for loop- messages finally sent in order
-        #     for msg in sent:
-        #         self.sendBuffer.remove(msg)
-
-        #     msgs = nextSend
-        #     self.connection.sendall(output)
-            
-        #     self.recv = True
-
-        # def recvMsg(self):
-        #     output = []
-        #     data = self.connection.recv(1024)
-        #     string = str(data, ENCODING)
-
-        #     for s in string.split(DELIMITER):
-        #         if s != '': output.append(s)
-
-        #     return output
-
         def getAddress(self):
             return self.address
 
@@ -164,7 +130,7 @@ class Client(threading.Thread):
         self.sendBuffer = []
         self.recvBuffer = []
         
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.address = (ipAddr, port)
         self.keepAlive = True
         self.recv = True
@@ -172,43 +138,16 @@ class Client(threading.Thread):
         self.start()
 
     def run(self):
-        self.sock.connect(self.address)
+        self.connection.connect(self.address)
 
         while self.keepAlive:
             if len(self.sendBuffer) > 0:
-                sendMsgs(self.sendBuffer, self)
+                sendMsg(self.sendBuffer, self)
             if self.recv: 
-                for s in recvMsgs(self):
+                for s in recvMsg(self):
                     if s != '':
                         self.recvBuffer.append(s)
 
-    # def sendMsgs(self, msgs):
-    #     output = b''
-    #     sent = []
-    #     nextSend = []
-
-    #     for msg in msgs:
-    #         if len(output + bytes(msg + DELIMITER, ENCODING)) <= 1024:
-    #             output += bytes(msg + DELIMITER, ENCODING)
-    #         else:
-    #             nextSend.append(msg)
-    #         sent.append(msg)
-
-    #     for msg in sent:
-    #         self.sendBuffer.remove(msg)
-
-    #     msgs = nextSend
-    #     self.sock.sendall(output)
-    #     self.recv = True
-
-
-    # def recvMsgs(self):
-    #     data = self.sock.recv(1024)
-    #     string = str(data, ENCODING)
-
-    #     if data: self.recv = False
-
-    #     return string.split(DELIMITER)
 
 ##UDP Peer
 #class Peer(threading.Thread):
