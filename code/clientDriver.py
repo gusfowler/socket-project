@@ -4,7 +4,7 @@ from time import sleep
 
 import Connection
 
-from ManagePeer2Peer import ClientPlayer
+from ManagePeer2Peer import Player
 
 IP = Connection.getIP()
 print (sys.argv)
@@ -22,7 +22,7 @@ print("My IP is:\t", IP)
 IP = socket.gethostbyname("socket-project_server_1")
 #IP = '172.19.0.3'
 print("Server IP is:\t", IP)
-player = ClientPlayer(IP, CLIENT_NAME)
+player = Player(IP, CLIENT_NAME)
 
 
 # while True:

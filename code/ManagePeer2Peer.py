@@ -28,8 +28,20 @@ class Manager(threading.Thread):
                 return player
         return -1
 
+    def findPlayerByAddress(self, address):
+        for player in self.players:
+            if address == player.address:
+                return player
+        return -1
+
+    def findPlayerByIP(self, IP):
+        for player in self.players:
+            if IP == player.address[0]:
+                return player
+        return -1
+
+
     def registerPlayer(self, address, name):
-        print(name)
         player = self.Player(address, name)
         self.players.append(player)
 
@@ -61,6 +73,7 @@ class Manager(threading.Thread):
 
             for msg in incomingMessages:
                 if msg[0][1] not in PORTS_USED: PORTS_USED.append(msg[0][1])
+
                 if 'REGISTER' in msg[1]:
                     register = msg[1].split(' ')
                     if self.findPlayer(register[1]) == -1:
@@ -69,13 +82,19 @@ class Manager(threading.Thread):
                     else:
                         self.server.sendMsg(msg[0], "FAILURE")
                         self.server.drop(msg[0])
-            
-            for player in self.players:
-                print("Player: ", player.name, "\t", player.Peers)
+                
+                if 'QUERY PLAYERS' == msg[1]:
+                    player = self.findPlayerByAddress(msg[0])
+                    if player != -1: 
+                        for peer in player.Peers:
+                            self.server.sendMsg(msg[0], "PLAYER " + str(self.findPlayerByIP(peer[0]).name) + " " \
+                            + peer[0] + " " + str(peer[1]))
+                    else:
+                        self.server.sendMsg(msg[0], 'FAILURE')
 
             sleep(Connection.SLEEP_TIME)
 
-class ClientPlayer(threading.Thread):
+class Player(threading.Thread):
     def __init__(self, IP, NAME):
         threading.Thread.__init__(self)
         self.server = Connection.Client(IP, int(PORT_LOWER_BOUND))
@@ -106,8 +125,13 @@ class ClientPlayer(threading.Thread):
                         print("Register Error")
                         self.runFlag = False
 
+                if 'PLAYER' in msg:
+                    print(msg)
+
             if self.registered:
                 self.server.sendMsg("QUERY PLAYERS")
+                self.registered = False
+
         print(self.name, "\tdied")
 
 
