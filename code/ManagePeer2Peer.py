@@ -75,7 +75,36 @@ class Manager(threading.Thread):
             sleep(Connection.SLEEP_TIME)
 
 class Player(threading.Thread):
-    def __init__(self):
+    def __init__(self, IP, NAME):
         threading.Thread.__init__(self)
+        self.server = Connection.Client(IP, PORT_LOWER_BOUND)
+        self.NAME = NAME
+        self.Peers = []
+        self.runFlag = True
+        self.registered = False
+
+        self.start()
+
+    def __del__(self):
+        self.runFlag = False
+        threading.Thread.__del__(self)
+
+    def run(self):
+        while self.runFlag:
+            msgs = self.server.getMsgs()
+
+            for msg in msgs:
+                if msg = 'hello!':
+                    self.server.sendMsg("REGISTER " + self.name)
+                    newMsgs = self.server.getMsgs()
+                    if newMsgs[0] = 'SUCCESS':
+                        self.registered = True
+                    else:
+                        print("Register Error")
+                        self.runFlag = False
+        print(self.name, "\tdied")
+
+
+
 
                     

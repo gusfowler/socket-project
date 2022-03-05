@@ -3,11 +3,11 @@ import socket
 from time import sleep
 
 import Connection
-from ManagePeer2Peer import PORT_LOWER_BOUND
-#from ManagePeer2Peer import Player
+
+from ManagePeer2Peer import Player
 
 IP = Connection.getIP()
-PORT = int(PORT_LOWER_BOUND)
+
 CLIENT_NAME = str(sys.argv[1])
 
 #if len(sys.argv > 0):
@@ -22,7 +22,7 @@ print("My IP is:\t", IP)
 IP = socket.gethostbyname("socket-project_server_1")
 #IP = '172.19.0.3'
 print("Server IP is:\t", IP)
-server = Connection.Client(IP, PORT)
+player = Player(IP)
 
 
 while True:
