@@ -35,7 +35,6 @@ class Manager(threading.Thread):
         if len(self.players) > 1:
             for player in self.players:
                 for peer in self.players:
-                    print("hit here")
                     if player.name != peer.name and (player, peer) not in self.pairs_evaled and (peer, player) not in self.pairs_evaled:
                         port = generatePort()
                         

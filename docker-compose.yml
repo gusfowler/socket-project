@@ -11,13 +11,20 @@ services:
       image: "python:3.7-alpine"
       volumes: 
         - ./code:/code
-      entrypoint: python /code/clientDriver1.py
+      entrypoint: python /code/clientDriver.py CLIENT1
       stdin_open: true
       tty: true
     client2:
       image: "python:3.7-alpine"
       volumes: 
         - ./code:/code
-      entrypoint: python /code/clientDriver2.py
+      entrypoint: python /code/clientDriver.py CLIENT2
+      stdin_open: true
+      tty: true
+    client3:
+      image: "python:3.7-alpine"
+      volumes: 
+        - ./code:/code
+      entrypoint: python /code/clientDriver.py CLIENT3
       stdin_open: true
       tty: true
