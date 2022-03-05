@@ -67,6 +67,7 @@ class Server(threading.Thread):
         def __del__(self):
             self.listenFlag = False
             self.connection.close()
+            threading.Thread.__del__(self)
 
         def run(self):
             counter = 0

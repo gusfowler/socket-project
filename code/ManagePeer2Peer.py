@@ -74,4 +74,8 @@ class Manager(threading.Thread):
 
             sleep(Connection.SLEEP_TIME)
 
+class Player(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+
                     
