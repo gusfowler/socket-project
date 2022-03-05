@@ -29,6 +29,7 @@ class Manager(threading.Thread):
         return -1
 
     def registerPlayer(self, address, name):
+        print(name)
         player = self.Player(address, name)
         self.players.append(player)
 
@@ -68,20 +69,21 @@ class Manager(threading.Thread):
                     else:
                         self.server.sendMsg(msg[0], "FAILURE")
                         self.server.drop(msg[0])
-
+            
             for player in self.players:
                 print("Player: ", player.name, "\t", player.Peers)
 
             sleep(Connection.SLEEP_TIME)
 
-class Player(threading.Thread):
+class ClientPlayer(threading.Thread):
     def __init__(self, IP, NAME):
         threading.Thread.__init__(self)
-        self.server = Connection.Client(IP, PORT_LOWER_BOUND)
+        self.server = Connection.Client(IP, int(PORT_LOWER_BOUND))
         self.NAME = NAME
         self.Peers = []
         self.runFlag = True
         self.registered = False
+        self.localSleepTime = 2
 
         self.start()
 
@@ -94,14 +96,18 @@ class Player(threading.Thread):
             msgs = self.server.getMsgs()
 
             for msg in msgs:
-                if msg = 'hello!':
-                    self.server.sendMsg("REGISTER " + self.name)
+                if msg == 'hello!':
+                    self.server.sendMsg("REGISTER " + self.NAME)
+                    sleep(self.localSleepTime)
                     newMsgs = self.server.getMsgs()
-                    if newMsgs[0] = 'SUCCESS':
+                    if len(newMsgs) > 0 and newMsgs[0] == 'SUCCESS':
                         self.registered = True
                     else:
                         print("Register Error")
                         self.runFlag = False
+
+            if self.registered:
+                self.server.sendMsg("QUERY PLAYERS")
         print(self.name, "\tdied")
 
 
