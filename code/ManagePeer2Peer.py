@@ -9,7 +9,7 @@ PORT_LOWER_BOUND = (((GROUP_NUMBER / 2) * 1000) + 1000)
 PORT_UPPER_BOUND = (((GROUP_NUMBER / 2) * 1000) + 1499)
 
 def generatePort():
-    for port in range(PORT_LOWER_BOUND, PORT_UPPER_BOUND + 1):
+    for port in range(int(PORT_LOWER_BOUND), int(PORT_UPPER_BOUND) + 1):
         if port not in PORTS_USED:
             return port
     print("ERROR:\tALL PORTS USED")
@@ -29,12 +29,13 @@ class Manager(threading.Thread):
         return -1
 
     def registerPlayer(self, address, name):
-        player = Player(address, name)
+        player = self.Player(address, name)
         self.players.append(player)
 
         if len(self.players) > 1:
             for player in self.players:
                 for peer in self.players:
+                    print("hit here")
                     if player.name != peer.name and (player, peer) not in self.pairs_evaled and (peer, player) not in self.pairs_evaled:
                         port = generatePort()
                         
@@ -63,7 +64,7 @@ class Manager(threading.Thread):
                 if 'REGISTER' in msg[1]:
                     register = msg[1].split(' ')
                     if self.findPlayer(register[1]) == -1:
-                        self.players.append(self.Player(msg[0], register[1]))
+                        self.registerPlayer(msg[0], register[1])
                         self.server.sendMsg(msg[0], "SUCCESS")
                     else:
                         self.server.sendMsg(msg[0], "FAILURE")

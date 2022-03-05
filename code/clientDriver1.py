@@ -7,7 +7,7 @@ from ManagePeer2Peer import PORT_LOWER_BOUND
 #from ManagePeer2Peer import Player
 
 IP = Connection.getIP()
-PORT = PORT_LOWER_BOUND
+PORT = int(PORT_LOWER_BOUND)
 
 #if len(sys.argv > 0):
 #    for arg in sys.argv:
