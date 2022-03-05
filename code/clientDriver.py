@@ -1,13 +1,14 @@
 import sys
 import socket
 from time import sleep
-from ManagePeer2Peer import PORT_LOWER_BOUND
 
 import Connection
+from ManagePeer2Peer import PORT_LOWER_BOUND
 #from ManagePeer2Peer import Player
 
 IP = Connection.getIP()
 PORT = int(PORT_LOWER_BOUND)
+CLIENT_NAME = str(sys.argv[1])
 
 #if len(sys.argv > 0):
 #    for arg in sys.argv:
@@ -27,5 +28,5 @@ server = Connection.Client(IP, PORT)
 while True:
     if len(server.recvBuffer) > 0: 
         print("Driver:\t", server.getMsgs())
-        server.sendMsg("REGISTER cole")
+        server.sendMsg("REGISTER " + CLIENT_NAME)
     sleep(Connection.SLEEP_TIME)
