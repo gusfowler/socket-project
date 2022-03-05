@@ -20,7 +20,7 @@ class Manager(threading.Thread):
         def __init__(self, address, name):
             self.address = address
             self.name = name
-            self.Peers = []
+            self.UDPPort = 0
 
     def findPlayer(self, name):
         for player in self.players:
@@ -40,21 +40,16 @@ class Manager(threading.Thread):
                 return player
         return -1
 
-
     def registerPlayer(self, address, name):
         player = self.Player(address, name)
         self.players.append(player)
 
         if len(self.players) > 1:
             for player in self.players:
-                for peer in self.players:
-                    if player.name != peer.name and (player, peer) not in self.pairs_evaled and (peer, player) not in self.pairs_evaled:
-                        port = generatePort()
-                        
-                        PORTS_USED.append(port)
-                        player.Peers.append((peer.address[0], port))
-                        peer.Peers.append((player.address[0], port))
-                        self.pairs_evaled.append((player, peer))
+                if player.UDPPort == 0:
+                    port = generatePort()
+                    player.UDPPort = port
+                    PORTS_USED.append(port)
 
     def __init__(self, IP):
         threading.Thread.__init__(self)
@@ -84,22 +79,26 @@ class Manager(threading.Thread):
                         self.server.drop(msg[0])
                 
                 if 'QUERY PLAYERS' == msg[1]:
-                    player = self.findPlayerByAddress(msg[0])
-                    if player != -1: 
-                        for peer in player.Peers:
-                            self.server.sendMsg(msg[0], "PLAYER " + str(self.findPlayerByIP(peer[0]).name) + " " \
-                            + peer[0] + " " + str(peer[1]))
-                    else:
-                        self.server.sendMsg(msg[0], 'FAILURE')
+                    for player in self.players:
+                        self.server.sendMsg(msg[0], "PLAYER " + player.name + " " + player.address[0] + " " + str(player.UDPPort))
 
             sleep(Connection.SLEEP_TIME)
 
 class Player(threading.Thread):
+    class fellowPlayer:
+        def __init__(self, name, ip, port):
+            self.NAME = name
+            self.address = (ip, port)
+            print("New Fellow Player:\t", self.NAME, " ", self.address[0], " ", self.address[1])
+
     def __init__(self, IP, NAME):
         threading.Thread.__init__(self)
         self.server = Connection.Client(IP, int(PORT_LOWER_BOUND))
+        self.UDPSocket = None
         self.NAME = NAME
-        self.Peers = []
+        self.myIP = ''
+        self.myPort = 0
+        self.fellowPlayers = []
         self.runFlag = True
         self.registered = False
         self.localSleepTime = 2
@@ -110,6 +109,41 @@ class Player(threading.Thread):
         self.runFlag = False
         threading.Thread.__del__(self)
 
+    def initUDP(self):
+        self.UDPSocket = Connection.Peer(self.myIP, self.myPort)
+
+    def parsePlayer(self, msg):
+        input = msg.split(" ")
+        name = ''
+        ip = ''
+        port = 0
+
+        count = 0
+        for part in input:
+            if part == 'PLAYER':
+                count += 1
+                continue
+            if count == 1:
+                count += 1
+                name = part
+                continue
+            if count == 2:
+                ip = part
+                count += 1
+                continue
+            if count == 3:
+                port = int(part)
+                continue
+
+        if name == self.NAME:
+            self.myIP = ip
+            self.myPort = port
+            print("My UDP Port is ", self.myPort)
+            self.initUDP()
+        else:
+            player = self.fellowPlayer(name, ip, port)
+            self.fellowPlayers.append(player)
+        
     def run(self):
         while self.runFlag:
             msgs = self.server.getMsgs()
@@ -126,11 +160,24 @@ class Player(threading.Thread):
                         self.runFlag = False
 
                 if 'PLAYER' in msg:
-                    print(msg)
+                    self.parsePlayer(msg)
 
             if self.registered:
                 self.server.sendMsg("QUERY PLAYERS")
                 self.registered = False
+
+            if not self.UDPSocket is None:
+                for player in self.fellowPlayers:
+                    self.UDPSocket.putMsg("Hello from " + self.NAME, player.address)
+                recvMsgs = self.UDPSocket.getMsgs()
+                for msg in recvMsgs:
+                    name = ""
+                    for player in self.fellowPlayers:
+                        if msg[1] == player.address:
+                            name = player.NAME
+                    print(msg[0], "\t", name)
+
+            sleep(Connection.SLEEP_TIME)
 
         print(self.name, "\tdied")
 

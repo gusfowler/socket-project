@@ -175,15 +175,59 @@ class Client(threading.Thread):
         self.sendBuffer.append(msg)
 
 
-# #UDP Peer
-# class Peer(threading.Thread):
+#UDP Peer
+class Peer(threading.Thread):
 
-#    def __init__(self, ipAddr, port):
-#        threading.Thread.__init__(self)
+    def __init__(self, ipAddr, port):
+        threading.Thread.__init__(self)
 
-#        self.address = (ipAddr, port)
-#        self.start()
+        self.sendBuffer = []
+        self.recvBuffer = []
+        
+        self.connection = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.address = (ipAddr, port)
+        self.keepAlive = True
+        self.recv = True
 
-#    def run(self):
-#         #do stuff
+        self.start()
+
+    def putMsg(self, msg, destination):
+        self.sendBuffer.append((msg, destination))
+
+    def getMsgs(self):
+        output = []
+        for msg in self.recvBuffer:
+            output.append(msg)
+
+        for msg in output:
+            self.recvBuffer.remove(msg)
+
+        return output
+
+    def run(self):
+        def sendMsg(msg, destination):
+            output = bytes(msg, ENCODING)
+            self.connection.sendto(output, destination)
+            self.recv = True
+
+        def recvMsg():
+            recv = self.connection.recvfrom(1024)
+            recv = (str(recv[0], ENCODING), recv[1])
+            self.recv = False
+            return recv
+
+        self.connection.bind(self.address)
+
+        while self.keepAlive:
+            if len(self.sendBuffer) > 0:
+                output = []
+                for outBound in self.sendBuffer:
+                    sendMsg(outBound[0], outBound[1])
+                    output.append(outBound)
+                for msg in output:
+                    self.sendBuffer.remove(msg)
+
+            
+            if self.recv == True: self.recvBuffer.append(recvMsg())
+
 
