@@ -2,6 +2,7 @@ import Connection
 import threading
 from time import sleep
 
+## CHECKING TO SEE IF SUBLIME TEXT WORKS
 PORTS_USED = []
 GROUP_NUMBER = 44
 PORT_LOWER_BOUND = (((GROUP_NUMBER / 2) * 1000) + 1000)
