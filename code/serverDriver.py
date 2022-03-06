@@ -19,5 +19,4 @@ server = Manager(IP)
 
 count = 0
 while True:
-    print("Number of players:\t", len(server.players))
-    sleep(5)
+    
