@@ -38,8 +38,11 @@ elif args[0] == 'player':
             if player.gameReady():
                 player.startGame(args[3], args[4])
                 break
-                
+
     while True:
-        if player.gameReady():
-            player.queryGames()
+        if player.gameReady(): 
+            if player.game is None:
+                player.queryGames()
+            if not player.game is None:
+                player.hand()
         sleep(5)

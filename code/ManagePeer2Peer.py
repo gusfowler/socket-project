@@ -178,6 +178,7 @@ class playerConnection(threading.Thread):
         for player in self.fellowPlayers:
             if player.NAME == name:
                 return player
+        return -1
 
     def getFellowPlayerByAddress(self, address):
         for player in self.fellowPlayers:
