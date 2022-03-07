@@ -11,27 +11,27 @@ services:
       image: "python:3.7-alpine"
       volumes: 
         - ./code:/code
-      entrypoint: python /code/driver.py player CLIENT1
+      entrypoint: python /code/driver.py player gus
       stdin_open: true
       tty: true
     client2:
       image: "python:3.7-alpine"
       volumes: 
         - ./code:/code
-      entrypoint: python /code/driver.py player CLIENT2
+      entrypoint: python /code/driver.py player cole
       stdin_open: true
       tty: true
     client3:
       image: "python:3.7-alpine"
       volumes: 
         - ./code:/code
-      entrypoint: python /code/driver.py player CLIENT3
+      entrypoint: python /code/driver.py player joe
       stdin_open: true
       tty: true
     client4:
       image: "python:3.7-alpine"
       volumes: 
         - ./code:/code
-      entrypoint: python /code/driver.py player CLIENT4 start CLIENT1 3
+      entrypoint: python /code/driver.py player taco start gus 3
       stdin_open: true
       tty: true
