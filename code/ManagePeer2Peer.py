@@ -188,7 +188,7 @@ class playerConnection(threading.Thread):
 
     def getGameMsgs(self):
         output = []
-        
+
         for msg in self.gameBuffer:
             output.append((msg, 'server'))
 

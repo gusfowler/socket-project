@@ -29,6 +29,7 @@ class Player:
             for x in range(0, 6):
                 hand.append(self.deck.pop(0))
             self.playersDelt.append(player)
+            return hand
 
     def __init__(self, serverIP, myName):
         self.connection = playerConnection(serverIP, myName)
@@ -82,17 +83,25 @@ class Player:
                 print("I am the Dealer!")
                 self.dealer = self.Dealer()
                 while True:
+                    sleep(3)
                     incoming = self.getMsgs()
                     for msg in incoming:
+                        if msg[1] == 'server':
+                            #print(msg[0])
+                            continue
                         player = self.connection.getFellowPlayerByAddress(msg[1])
-                        if msg[0] == 'HAND':
-                            hand = self.dealer.getHand(player.NAME)
-                            for card in hand:
-                                self.sendMsg("CARD " + card[0] + " " + card[1], player.name)
-
+                        if player != -1:
+                            print(player.NAME)
+                            if msg[0] == 'HAND':
+                                print("got Hand Message")
+                                hand = self.dealer.getHand(player.NAME)
+                                for card in hand:
+                                    self.sendMsg("CARD " + card[0] + " " + card[1], player.NAME)
+                                    sleep(1)
             else:
+                print("sent hand request")
                 self.sendMsg('HAND', self.game.dealerName)
-                sleep(1) 
+                sleep(3) 
                 print(self.getMsgs())
 
     def queryGames(self):

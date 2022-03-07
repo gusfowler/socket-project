@@ -229,7 +229,6 @@ class Peer(threading.Thread):
                 for msg in output:
                     self.sendBuffer.remove(msg)
 
-            
             if self.recv == True: self.recvBuffer.append(recvMsg())
 
 
