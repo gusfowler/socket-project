@@ -1,9 +1,9 @@
 import sys
 from time import sleep
-from Connection import getIP()
-from socket import gethostbyname()
+from Connection import getIP
+from socket import gethostbyname
 
-args = sys.argfv
+args = sys.argv
 
 args.remove('/code/driver.py')
 
@@ -17,9 +17,29 @@ if args[0] == 'manager':
 
     while True:
         print("Number of players: ", len(server.players), "\tNumber of Games: ", len(server.games))
+        if len(server.games) > 0:
+            output = ""
+            for game in server.games:
+                for player in game.players:
+                    output += player.name + " "
+            print(output)
         sleep(5)
 
 elif args[0] == 'player':
-    from ManagePeer2Peer import Player
+    from managePlayer import Player
     myName = args[1]
-    player = Player(IP, myName)
+    print("I am ", myName)
+    sleep(5)
+    player = Player(serverIP, myName)
+
+    if len(args) > 2 and args[2] == 'start':
+        #sleep(10)
+        while True:
+            if player.gameReady():
+                player.startGame(args[3], args[4])
+                break
+                
+    while True:
+        if player.gameReady():
+            player.queryGames()
+        sleep(5)

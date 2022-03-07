@@ -4,7 +4,7 @@ from time import sleep
 
 DELIMITER = "\t"
 ENCODING = 'utf-8'
-SLEEP_TIME = 1
+SLEEP_TIME = 1.5
 
 def getIP():
     return socket.gethostbyname(socket.gethostname())
@@ -80,6 +80,7 @@ class Server(threading.Thread):
                     for msg in recvMsg(self): self.recvBuffer.append(msg)
                 counter += 1
                 sleep(SLEEP_TIME)
+            print(self.address, " died")
 
         def getAddress(self):
             return self.address
@@ -107,6 +108,7 @@ class Server(threading.Thread):
             connection, address = self.server.accept()
 
             self.arrClients.append(self.Client(connection, address))
+        print("Server died!")
 
     def getMsgs(self):
         output = []

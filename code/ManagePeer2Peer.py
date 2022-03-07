@@ -16,13 +16,16 @@ def generatePort():
     return -1
 
 class Manager(threading.Thread):
-    from Game import manageGame
+    from manageGame import manageGame
+
     class Player:
         def __init__(self, address, name):
             self.address = address
             self.name = name
             self.UDPPort = 0
             self.inGame = False
+            self.gameReady = False
+            self.gameSent = False
 
     def findPlayer(self, name):
         for player in self.players:
@@ -87,23 +90,28 @@ class Manager(threading.Thread):
 
                 if 'START GAME' in msg[1]:
                     startMsg = msg[1].split(' ')
+                    print(startMsg)
                     dealerName = startMsg[2]
                     numberAddtlPlayers = int(startMsg[3])
 
                     if self.findPlayer(dealerName) != -1 and numberAddtlPlayers <= 3 and numberAddtlPlayers >= 1:
-                        newGame = manageGame(self.findPlayer(dealerName), numAddtlPlayers, self.server)
+                        newGame = self.manageGame(self.findPlayer(dealerName), numberAddtlPlayers, self.server)
+                        self.server.sendMsg(msg[0], 'SUCCESS')
                         if newGame.addPlayers(self.players) == -1:
                             self.server.sendMsg(msg[0], 'FAILURE')
                         else:
-                            newGame.notify()
                             self.games.append(newGame)
                     else:
                         self.server.sendMsg(msg[0], 'FAILURE')
 
+                if 'QUERY GAME' == msg[1]:
+                    for game in self.games:
+                        self.server.sendMsg(msg[0], "GAME " + game.gameMsg())
+
 
             sleep(Connection.SLEEP_TIME)
 
-class Player(threading.Thread):
+class playerConnection(threading.Thread):
     class fellowPlayer:
         def __init__(self, name, ip, port):
             self.NAME = name
@@ -122,7 +130,9 @@ class Player(threading.Thread):
         self.runFlag = True
         self.registered = False
         self.localSleepTime = 2
-        self.helloFromAll = True
+        self.helloFromAll = False
+        self.gameBuffer = []
+        self.fellowPlayerBuffer = []
         self.start()
 
     def __del__(self):
@@ -164,6 +174,34 @@ class Player(threading.Thread):
             player = self.fellowPlayer(name, ip, port)
             self.fellowPlayers.append(player)
         
+    def getFellowPlayer(self, name):
+        for player in self.fellowPlayers:
+            if player.NAME == name:
+                return player
+
+    def getFellowPlayerByAddress(self, address):
+        for player in self.fellowPlayers:
+            if address == player.address:
+                return player
+        return -1
+
+    def getGameMsgs(self):
+        output = []
+        
+        for msg in self.gameBuffer:
+            output.append((msg, 'server'))
+
+        for msg in self.fellowPlayerBuffer:
+            output.append(msg)
+
+        for sent in output:
+            if sent[1] == 'server':
+                self.gameBuffer.remove(sent[0])
+            else:
+                self.fellowPlayerBuffer.remove(sent)
+        
+        return output
+
     def run(self):
         while self.runFlag:
             msgs = self.server.getMsgs()
@@ -182,6 +220,9 @@ class Player(threading.Thread):
                 if 'PLAYER' in msg:
                     self.parsePlayer(msg)
 
+                if 'GAME' in msg:
+                    self.gameBuffer.append(msg)
+
             if self.registered:
                 self.server.sendMsg("QUERY PLAYERS")
                 self.registered = False
@@ -198,14 +239,16 @@ class Player(threading.Thread):
                     recvMsgs = self.UDPSocket.getMsgs()
                     if len(recvMsgs) > 0:
                         for msg in recvMsgs:
-                            name = ""
-                            for player in self.fellowPlayers:
-                                if msg[1] == player.address:
-                                    name = player.NAME
+                            if 'Hello' in msg[0]:
+                                player = self.getFellowPlayerByAddress(msg[1])
+                                if player != -1:
                                     player.saidHello = True
-                            print(msg[0], "\t", name)
+                                    print(msg[0], "\t", player.NAME)
+                                else:
+                                    print("Hello from not found player at ", msg[1])
+                            else:
+                                self.fellowPlayerBuffer.append(msg)
                     self.helloFromAll = True
-                    
 
             sleep(Connection.SLEEP_TIME)
 
